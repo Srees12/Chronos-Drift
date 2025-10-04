@@ -19,7 +19,7 @@ function App() {
     // Show loading message
     setChatMessages((msgs) => [...msgs, { sender: "bot", text: "Thinking..." }]);
     try {
-      const res = await fetch("http://localhost:5000/chat", {
+  const res = await fetch("https://chronosflex-backend.onrender.com/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: chatInput })
@@ -45,13 +45,18 @@ function App() {
       setLoading(true);
       try {
         // === NASA API ===
-        const NASA_API_KEY = "NxJcliSUnUIawqafmbIU9HTkZACDl4zqXHDI7Qhl"; // Replace with your own for production
+  const NASA_API_KEY = "6HAswFkbVaZAz5WCeVmwYTnkca3nWyPfMYQQemey"; // Replace with your own NASA API key from https://api.nasa.gov/
         const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
         const nasaUrl = `https://api.nasa.gov/neo/rest/v1/feed?start_date=${today}&end_date=${today}&api_key=${NASA_API_KEY}`;
 
         const nasaRes = await fetch(nasaUrl);
+        if (!nasaRes.ok) {
+          setAsteroids([]);
+          setLoading(false);
+          alert("NASA API error: " + nasaRes.status + ". Please check your API key or try again later.");
+          return;
+        }
         const nasaData = await nasaRes.json();
-
         const todayAsteroids = nasaData?.near_earth_objects?.[today] || [];
         setAsteroids(todayAsteroids);
 
